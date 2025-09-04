@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -55,5 +56,11 @@ public class BillingController {
 
         return billEntity.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("testCommunication")
+    public Map<String,String> testCommunication(){
+        String m=customerRestClient.getStateCommunication();
+        return Map.of("State",m);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -41,5 +42,11 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         return service.deleteCustomer(id);
+    }
+
+
+    @GetMapping("testTolerance")
+    public String testCommunication(){
+        return "Communication OK";
     }
 }

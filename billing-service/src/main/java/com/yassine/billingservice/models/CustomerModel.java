@@ -5,6 +5,12 @@ public class CustomerModel {
     private String name;
     private String username;
 
+    public CustomerModel(String id, String default_nom, String default_email) {
+        this.id=id;
+        this.name=default_nom;
+        this.username=default_email;
+    }
+
     public String getId() {
         return id;
     }

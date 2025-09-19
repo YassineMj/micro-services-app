@@ -1,0 +1,41 @@
+<div class="container mt-4">
+  <h2>Liste des factures</h2>
+
+  <!-- Loader / Error -->
+  <div *ngIf="loading" class="alert alert-info">Chargement...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- Table des factures -->
+  <table class="table table-hover mt-3" *ngIf="billings.length > 0">
+    <thead class="table-dark">
+    <tr>
+      <th>#</th>
+      <th>Client</th>
+      <th>Date</th>
+      <th>Détails produits</th>
+      <th>Total ($)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let b of billings; let i = index">
+      <td>{{ i + 1 }}</td>
+      <td>{{ b.customer.name }}</td>
+      <td>{{ b.billingDate | date:'short' }}</td>
+
+      <!-- Détails produits -->
+      <td>
+        <ul class="list-unstyled mb-0">
+          <li *ngFor="let item of b.productItems">
+            {{ item.product.name }}
+            ({{ item.quantity }} x {{ item.unitPrice | number:'1.2-2' }} $ =
+            {{ (item.quantity * item.unitPrice) | number:'1.2-2' }} $)
+          </li>
+        </ul>
+      </td>
+
+      <!-- Total facture -->
+      <td>{{ getTotal(b) | number:'1.2-2' }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

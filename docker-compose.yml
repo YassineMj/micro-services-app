@@ -1,0 +1,87 @@
+services:
+
+  ecom-discovery-service:
+    build: ./discovery-service
+    container_name: ecom-discovery-service
+    ports:
+      - 8761:8761
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+
+  ecom-config-service:
+    build: ./config-service
+    container_name: ecom-config-service
+    ports:
+      - 8084:8084
+    depends_on:
+      ecom-discovery-service:
+        condition: service_healthy
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ecom-discovery-service:8761/eureka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
+
+  ecom-customer-service:
+    build: ./customer-service
+    container_name: ecom-cutomer-service
+    ports:
+      - 8081:8081
+    depends_on:
+      ecom-config-service:
+          condition: service_healthy
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ecom-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ecom-config-service:8084
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+
+  ecom-inventory-service:
+    build: ./inventory-service
+    container_name: ecom-inventory-service
+    ports:
+      - 8082:8082
+    depends_on:
+      ecom-customer-service:
+        condition: service_healthy
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ecom-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ecom-config-service:8084
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+
+  ecom-billing-service:
+    build: ./billing-service
+    container_name: ecom-billing-service
+    ports:
+      - 8083:8083
+    depends_on:
+      ecom-inventory-service:
+        condition: service_healthy
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ecom-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ecom-config-service:8084
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+
+  ecom-gateway:
+    build: ./gateway
+    container_name: ecom-gateway
+    ports:
+      - 8888:8888
+    depends_on:
+      ecom-billing-service:
+        condition: service_healthy
+    environment:
+      - DISCOVERY_SERVICE_URL=http://ecom-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://ecom-config-service:8084
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+
+  ecom-front:
+    build: ./ecom-front
+    container_name: ecom-front
+    ports:
+      - 7000:80
+    depends_on:
+      ecom-gateway:
+        condition: service_healthy
